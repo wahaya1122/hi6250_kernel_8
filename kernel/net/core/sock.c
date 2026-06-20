@@ -574,7 +574,11 @@ static int sock_setbindtodevice(struct sock *sk, char __user *optval,
 
 	/* Sorry... */
 	ret = -EPERM;
-	if (!ns_capable(net->user_ns, CAP_NET_RAW) && !in_egroup_p(AID_INET))	
+	if (!ns_capable(net->user_ns, CAP_NET_RAW)
+#ifdef CONFIG_ANDROID_PARANOID_NETWORK
+		    && !in_egroup_p(AID_INET)
+#endif
+		    )	
 		goto out;
 
 	ret = -EINVAL;

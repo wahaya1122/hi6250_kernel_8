@@ -53,7 +53,7 @@ wifi-objs += $(hmac-objs)
 ifeq ($(CONFIG_HI110X_KERNEL_MODULES_BUILD_SUPPORT), yes)
 obj-m += wifi.o
 else
-obj-y += wifi.o
+obj-$(CONFIG_HI1102_WIFI) += wifi.o
 endif
 
 

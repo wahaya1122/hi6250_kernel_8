@@ -97,7 +97,7 @@ plat-objs += $(driver-objs)
 ifeq ($(CONFIG_HI110X_KERNEL_MODULES_BUILD_SUPPORT), yes)
 obj-m += plat.o
 else
-obj-y += plat.o
+obj-$(CONFIG_HI1102_PLATFORM) += plat.o
 endif
 
 HI1102_INCLUDES := -I$(DRIVER_PATH)/inc

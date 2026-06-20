@@ -237,17 +237,18 @@ int net_eq(const struct net *net1, const struct net *net2)
 #endif
 
 
+/*
+ * Always include the net pointer so that struct sizes (net_device, wiphy)
+ * do not change depending on CONFIG_NET_NS.  Without CONFIG_NET_NS the
+ * pointer stays NULL and read_pnet falls back to &init_net.
+ */
 typedef struct {
-#ifdef CONFIG_NET_NS
 	struct net *net;
-#endif
 } possible_net_t;
 
 static inline void write_pnet(possible_net_t *pnet, struct net *net)
 {
-#ifdef CONFIG_NET_NS
 	pnet->net = net;
-#endif
 }
 
 static inline struct net *read_pnet(const possible_net_t *pnet)
@@ -255,7 +256,7 @@ static inline struct net *read_pnet(const possible_net_t *pnet)
 #ifdef CONFIG_NET_NS
 	return pnet->net;
 #else
-	return &init_net;
+	return pnet->net ?: &init_net;
 #endif
 }
 

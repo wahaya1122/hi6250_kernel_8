@@ -12,39 +12,32 @@ jobs:
       with:
         repository: wahaya1122/hi6250_kernel_8
         path: thisRepo
+
     - name: Building
       run: |
 
         sudo apt update && sudo apt upgrade
-        sudo apt install -y git-core gnupg flex bison gperf build-essential zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 libx11-dev lib32z-dev libgl1-mesa-dev libxml2-utils xsltproc unzip bc gzip
-
-
+        sudo apt install -y git-core gnupg flex bison gperf build-essential zip curl \
+          zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 libx11-dev lib32z-dev \
+          libgl1-mesa-dev libxml2-utils xsltproc unzip bc gzip \
+          gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi
 
         mv thisRepo/* .
         rm -rf thisRepo
         sudo cp ./res/libdebuginfod.so.1 /usr/lib
         sudo chmod 777 /usr/lib/libdebuginfod.so.1
 
-
         mv kernel source
-
         cd source
-
         cd ..
 
-        git clone https://github.com/CoolestEnoch/kernel-su-xiaomi-cas
-
-        mv kernel-su-xiaomi-cas/gcc/ ./gcc
-        rm -rf kernel-su-xiaomi-cas
-
-
         export ARCH=arm64
-        export CROSS_COMPILE=$(pwd)/gcc/gcc-arm64-gcc-master/bin/aarch64-elf-
-        export CROSS_COMPILE_ARM32=$(pwd)/gcc/gcc-arm-gcc-master/bin/arm-eabi-
+        export CROSS_COMPILE=aarch64-linux-gnu-
+        export CROSS_COMPILE_ARM32=arm-linux-gnueabi-
 
         cd source
         make merge_hi6250_defconfig
-        make -j2
+        make -j$(nproc)
 
         cd arch/arm64/boot
         mv Image kernel-Image
@@ -60,7 +53,7 @@ jobs:
         echo ""
         echo "=== Building kernel modules ==="
         cd ${GITHUB_WORKSPACE}/source
-        make -j2 modules
+        make -j$(nproc) modules
         echo ""
         echo "=== Collecting module files ==="
         mkdir -p modules_out
@@ -68,8 +61,6 @@ jobs:
           echo "Found: $ko"
           cp "$ko" modules_out/
         done
-        echo ""
-        echo "=== Modules built ==="
         ls -la modules_out/
 
     - name: Upload Kernel Image

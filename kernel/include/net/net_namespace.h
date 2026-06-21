@@ -253,7 +253,7 @@ static inline void write_pnet(possible_net_t *pnet, struct net *net)
 static inline struct net *read_pnet(const possible_net_t *pnet)
 {
 #ifdef CONFIG_NET_NS
-	return pnet->net;
+	return pnet->net ? pnet->net : &init_net;
 #else
 	return &init_net;
 #endif
